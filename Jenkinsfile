@@ -1,6 +1,10 @@
 pipeline {
     agent any 
     
+    tools {
+        dockerTool 'docker'
+    }
+    
     // Se déclenche automatiquement sur un push GitHub
     triggers { githubPush() } 
 
