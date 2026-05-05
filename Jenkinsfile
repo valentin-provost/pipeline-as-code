@@ -27,10 +27,17 @@ pipeline {
                 sh "docker build -t ${APP_NAME}:${BUILD_NUMBER} ."
             }
         }
-                
+        
         stage('Export HTML Static') {
             steps {
-                sh "docker run --rm -v \${WORKSPACE}:/app -w /app -e NEXT_PUBLIC_BASE_PATH=/${APP_NAME} ${APP_NAME}:${BUILD_NUMBER} npm run build"
+                sh """
+                    docker run --name build-${BUILD_NUMBER} \
+                        -e NEXT_PUBLIC_BASE_PATH=/${APP_NAME} \
+                        ${APP_NAME}:${BUILD_NUMBER} \
+                        npm run build
+                    docker cp build-${BUILD_NUMBER}:/app/out ./out
+                    docker rm build-${BUILD_NUMBER}
+                """
             }
         }
         
